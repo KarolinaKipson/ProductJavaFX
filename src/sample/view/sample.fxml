@@ -9,28 +9,33 @@
 <?import javafx.scene.effect.ColorAdjust?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controller.Controller">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controller.Controller">
    <children>
-      <TableView fx:id="tableView" layoutY="32.0" prefHeight="456.0" prefWidth="600.0">
+      <TableView fx:id="tableView" layoutX="12.0" layoutY="35.0" prefHeight="453.0" prefWidth="624.0">
         <columns>
-            <TableColumn fx:id="productId" prefWidth="54.0" text="Id" />
-            <TableColumn fx:id="productName" prefWidth="117.0" text="Name" />
-          <TableColumn fx:id="productManufacturer" prefWidth="191.0" text="Manufacturer" />
-            <TableColumn fx:id="productPrice" prefWidth="137.0" text="Price" />
-          <TableColumn fx:id="productItems" prefWidth="100.0" text="Items Available" />
+            <TableColumn fx:id="productId" prefWidth="64.0" text="Id" />
+            <TableColumn fx:id="productName" prefWidth="122.0" text="Name" />
+          <TableColumn fx:id="productManufacturer" prefWidth="192.0" text="Manufacturer" />
+            <TableColumn fx:id="productPrice" prefWidth="132.0" text="Price" />
+          <TableColumn fx:id="productItems" prefWidth="113.0" text="Items Available" />
         </columns>
       </TableView>
-      <Button fx:id="btnDelete" layoutX="813.0" layoutY="412.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="73.0" text="Delete" />
-      <Button fx:id="btnAdd" layoutX="607.0" layoutY="412.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="85.0" text="Add" />
-      <TextField fx:id="inputName" layoutX="723.0" layoutY="86.0" />
-      <TextField fx:id="inputManufacturer" layoutX="723.0" layoutY="165.0" />
-      <Spinner fx:id="spinnerPrice" layoutX="723.0" layoutY="229.0" />
-      <Spinner fx:id="spinnerItems" layoutX="723.0" layoutY="305.0" />
-      <Label fx:id="lblName" layoutX="620.0" layoutY="90.0" text="Name" />
-      <Label fx:id="lblManufacturer" layoutX="623.0" layoutY="169.0" text="Manufacturer" />
-      <Label fx:id="lblPrice" layoutX="623.0" layoutY="233.0" text="Price" />
-      <Label fx:id="lblItems" layoutX="622.0" layoutY="309.0" text="Items" />
-      <Button fx:id="btnEdit" layoutX="714.0" layoutY="412.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="73.0" text="Edit" />
+      <Button fx:id="btnDelete" layoutX="914.0" layoutY="421.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="64.0" text="Delete" />
+      <Button fx:id="btnAdd" layoutX="659.0" layoutY="421.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="73.0" text="Add" />
+      <TextField fx:id="inputName" layoutX="819.0" layoutY="107.0" />
+      <TextField fx:id="inputManufacturer" layoutX="819.0" layoutY="175.0" />
+       <Spinner fx:id="spinnerPrice" layoutX="819.0" layoutY="251.0">
+
+       </Spinner>
+       <Spinner fx:id="spinnerItems" layoutX="819.0" layoutY="332.0">
+
+       </Spinner>
+      <Label fx:id="lblName" layoutX="704.0" layoutY="111.0" text="Name" />
+      <Label fx:id="lblManufacturer" layoutX="700.0" layoutY="179.0" text="Manufacturer" />
+      <Label fx:id="lblPrice" layoutX="707.0" layoutY="255.0" text="Price" />
+      <Label fx:id="lblItems" layoutX="706.0" layoutY="336.0" text="Items" />
+      <Button fx:id="btnEdit" layoutX="747.0" layoutY="421.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="64.0" text="Save" />
+      <Button fx:id="btnClear" layoutX="829.0" layoutY="421.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="64.0" text="Clear" />
    </children>
    <effect>
       <ColorAdjust />

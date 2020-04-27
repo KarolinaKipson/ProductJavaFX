@@ -1,5 +1,6 @@
 package sample.dialog;
 
 public interface Dialog {
-    void show(String message);
+    public void show(String message);
+    public void showAndWait(String message) throws InterruptedException;
 }

@@ -12,4 +12,13 @@ public class ErrorDialog implements Dialog {
         alert.setHeaderText(message);
         alert.show();
     }
+
+    @Override
+    public void showAndWait(String message) throws InterruptedException {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("ERROR");
+        alert.setHeaderText(message);
+        alert.show();
+        alert.wait(1000L);
+    }
 }

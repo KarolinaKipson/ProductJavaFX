@@ -7,19 +7,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import javafx.scene.input.MouseEvent;
+import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import sample.dialog.SuccessDialog;
+import sample.dialog.WarningDialog;
 import sample.model.Product;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class Controller implements Initializable {
 
@@ -46,6 +45,8 @@ public class Controller implements Initializable {
     @FXML
     public Button btnEdit;
     @FXML
+    public Button btnClear;
+    @FXML
     public TextField inputName;
     @FXML
     public TextField inputManufacturer;
@@ -54,7 +55,18 @@ public class Controller implements Initializable {
     @FXML
     public Spinner<Integer> spinnerItems;
 
+
     private void getAllData() throws RestClientException {
+        String resourceUrl = GET_ALL_PRODUCTS;
+        SpinnerValueFactory<Integer> valueFactoryInt =   new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1000, 1);
+        spinnerItems.setValueFactory(valueFactoryInt);
+
+        SpinnerValueFactory<Double> valueFactoryDouble =   new SpinnerValueFactory.DoubleSpinnerValueFactory(1.0, 100000.00, 0.1);
+        spinnerPrice.setValueFactory(valueFactoryDouble);
+
+        spinnerPrice.setEditable(true);
+        spinnerItems.setEditable(true);
+
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         List<MediaType> mediaTypes = new ArrayList<>();
@@ -65,6 +77,76 @@ public class Controller implements Initializable {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setMessageConverters(messageConverters);
 
+
+        tableView.getItems().setAll(showData(restTemplate));
+
+        btnDelete.setOnAction(e -> {
+            Product selectedItem = tableView.getSelectionModel().getSelectedItem();
+            tableView.getItems().remove(selectedItem);
+            restTemplate.delete(resourceUrl + "/"+ selectedItem.getProductId());
+
+            SuccessDialog successDialog = new SuccessDialog();
+            successDialog.show("You have successfully deleted product.");
+        });
+
+        btnAdd.setOnAction(e->{
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            RestTemplate restTemplateNew = new RestTemplate();
+
+             Product newProduct = new Product();
+             newProduct.setName(inputName.getText());
+             newProduct.setManufacturer(inputManufacturer.getText());
+             double price = spinnerPrice.getValueFactory().getValue();
+             int items = spinnerItems.getValueFactory().getValue();
+
+             newProduct.setPrice(price);
+             newProduct.setUnitInStock(items);
+             HttpEntity<?> request = new HttpEntity<>(newProduct, headers);
+
+             restTemplateNew.postForEntity(GET_ALL_PRODUCTS,request, Product.class);
+             SuccessDialog successDialog = new SuccessDialog();
+             successDialog.show("You have successfully added product.");
+             clearData();
+
+             tableView.getItems().setAll(showData(restTemplateNew));
+        });
+
+        btnClear.setOnAction(actionEvent -> {
+           clearData();
+        });
+
+        btnEdit.setOnAction(actionEvent -> {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            RestTemplate restTemplateEdit = new RestTemplate();
+
+            Product product = tableView.getSelectionModel().getSelectedItem();
+            product.setName(inputName.getText());
+            product.setManufacturer(inputManufacturer.getText());
+            product.setPrice(spinnerPrice.getValueFactory().getValue());
+            product.setUnitInStock(spinnerItems.getValueFactory().getValue());
+
+            HttpEntity<?> request = new HttpEntity<>(product, headers);
+            restTemplateEdit.put(GET_ALL_PRODUCTS + "/" + product.getProductId(), request, Product.class);
+
+            SuccessDialog successDialog = new SuccessDialog();
+            successDialog.show("You have successfully edited product.");
+
+            tableView.getItems().setAll(showData(restTemplateEdit));
+        });
+
+    }
+
+    public void clearData(){
+        inputName.clear();
+        inputManufacturer.clear();
+        spinnerPrice.getValueFactory().setValue(1.00);
+        spinnerItems.getValueFactory().setValue(1);
+    }
+
+    public ObservableList<Product> showData(RestTemplate restTemplate){
+
         String resourceUrl = GET_ALL_PRODUCTS;
         ResponseEntity<Product[]> response = restTemplate.getForEntity(resourceUrl, Product[].class);
         System.out.println("Status code: " + response.getStatusCode());
@@ -72,21 +154,8 @@ public class Controller implements Initializable {
 
         List<Product> productList = Arrays.asList(products);
         ObservableList<Product> observableList = FXCollections.observableArrayList(productList);
-
-        tableView.getItems().setAll(observableList);
-
-        btnDelete.setOnAction(e -> {
-            Product selectedItem = tableView.getSelectionModel().getSelectedItem();
-            tableView.getItems().remove(selectedItem);
-            restTemplate.delete(resourceUrl + "/"+ selectedItem.getProductId());
-        });
-
-        btnAdd.setOnAction(e->{
-
-        });
+        return observableList;
     }
-
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         tableView.setEditable(true);
@@ -96,6 +165,16 @@ public class Controller implements Initializable {
         productPrice.setCellValueFactory(new PropertyValueFactory<Product, Double>("price"));
         productItems.setCellValueFactory(new PropertyValueFactory<Product, Integer>("unitInStock"));
         getAllData();
+
+        tableView.setOnMouseClicked((MouseEvent event) -> {
+            if (event.getClickCount() > 1) {
+                if (tableView.getSelectionModel().getSelectedItem() != null) {
+                    Product selectedProduct = tableView.getSelectionModel().getSelectedItem();
+                    inputName.setText(selectedProduct.getName());
+                    inputManufacturer.setText(selectedProduct.getManufacturer());
+                    spinnerPrice.getValueFactory().setValue(selectedProduct.getPrice());
+                    spinnerItems.getValueFactory().setValue(selectedProduct.getUnitInStock());
+                }} });
 
     }
 
