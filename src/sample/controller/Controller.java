@@ -2,7 +2,6 @@ package sample.controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -14,7 +13,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import sample.dialog.SuccessDialog;
-import sample.dialog.WarningDialog;
 import sample.model.Product;
 
 import java.net.URL;
@@ -61,7 +59,7 @@ public class Controller implements Initializable {
         SpinnerValueFactory<Integer> valueFactoryInt =   new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1000, 1);
         spinnerItems.setValueFactory(valueFactoryInt);
 
-        SpinnerValueFactory<Double> valueFactoryDouble =   new SpinnerValueFactory.DoubleSpinnerValueFactory(1.0, 100000.00, 0.1);
+        SpinnerValueFactory<Double> valueFactoryDouble =   new SpinnerValueFactory.DoubleSpinnerValueFactory(1.00, 100000.00, 1.01);
         spinnerPrice.setValueFactory(valueFactoryDouble);
 
         spinnerPrice.setEditable(true);
@@ -81,12 +79,23 @@ public class Controller implements Initializable {
         tableView.getItems().setAll(showData(restTemplate));
 
         btnDelete.setOnAction(e -> {
-            Product selectedItem = tableView.getSelectionModel().getSelectedItem();
-            tableView.getItems().remove(selectedItem);
-            restTemplate.delete(resourceUrl + "/"+ selectedItem.getProductId());
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Delete");
+            alert.setHeaderText("You are about to delete a product!");
+            alert.setContentText("Are you sure you want to delete this product?");
 
-            SuccessDialog successDialog = new SuccessDialog();
-            successDialog.show("You have successfully deleted product.");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK){
+                Product selectedItem = tableView.getSelectionModel().getSelectedItem();
+                tableView.getItems().remove(selectedItem);
+                restTemplate.delete(resourceUrl + "/"+ selectedItem.getProductId());
+
+                SuccessDialog successDialog = new SuccessDialog();
+                successDialog.show("You have successfully deleted product.");
+            } else {
+              clearData();
+            }
+
         });
 
         btnAdd.setOnAction(e->{
@@ -105,11 +114,12 @@ public class Controller implements Initializable {
              HttpEntity<?> request = new HttpEntity<>(newProduct, headers);
 
              restTemplateNew.postForEntity(GET_ALL_PRODUCTS,request, Product.class);
+             clearData();
+             tableView.getItems().setAll(showData(restTemplateNew));
+
              SuccessDialog successDialog = new SuccessDialog();
              successDialog.show("You have successfully added product.");
-             clearData();
 
-             tableView.getItems().setAll(showData(restTemplateNew));
         });
 
         btnClear.setOnAction(actionEvent -> {
@@ -139,6 +149,7 @@ public class Controller implements Initializable {
     }
 
     public void clearData(){
+        tableView.getSelectionModel().clearSelection();
         inputName.clear();
         inputManufacturer.clear();
         spinnerPrice.getValueFactory().setValue(1.00);
